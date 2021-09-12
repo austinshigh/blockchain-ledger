@@ -40,29 +40,26 @@ public class Ledger {
         this.description = description;
         this.seed = seed;
         this.blockMap = new TreeMap<Integer, Block>();
-        this.genesisBlock = new Block();
+        this.genesisBlock = new Block(1, seed, null);
     }
 
     /**
-     * Used immediately after instantiation of new ledger.
+     * Adds the genesis block to the ledger's block map, sets maximum balance for ledger by creating master account.
      *
-     *
+     * Used after instantiation of new ledger.
      * @throws LedgerException com.cscie97.ledger. ledger exception
      */
     public void fundLedger() throws LedgerException {
         if (blockMap.size() != 0){
             throw new LedgerException("fund ledger", "fund ledger requires a new ledger");
         }
-        Account master = new Account("master");
-        master.setBalance(2147483647);
-        this.genesisBlock.getAccountBalanceMap().put("master", master);
-        this.genesisBlock.setPreviousHash(this.seed);
-        this.genesisBlock.setBlockNumber(1);
         blockMap.put(1, genesisBlock);
+        createAccount("master");
     }
 
     /**
      * Creates a new account after verifying that the user selected account address is unique.
+     * 
      * @param address address for new account (must be unique)
      * @return New Account
      * @throws LedgerException com.cscie97.ledger. ledger exception
@@ -74,10 +71,18 @@ public class Ledger {
             // if the most recent block contains the address already, require a unique address
             throw new LedgerException("create account", "unique account address required.");
         } else {
+            Account newAcct;
+            if ((address.equals("master") && (blockMap.size() == 1))){
+                // create master account and set maximum balance
+                newAcct = new Account("master");
+                newAcct.setBalance(2147483647);
+            }else{
+                // create account set balance to 0
+                newAcct = new Account(address);
+                newAcct.setBalance(0);
+            }
             // if valid address, create new account
             HashMap<String, Account> genAcctBalanceMap = currentBlock.getAccountBalanceMap();
-            Account newAcct = new Account(address);
-            newAcct.setBalance(0);
             // add new account to ledger account balance map
             genAcctBalanceMap.put(address, newAcct);
             return new Account(address);
