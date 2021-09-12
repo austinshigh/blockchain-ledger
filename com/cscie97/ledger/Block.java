@@ -7,6 +7,7 @@ import java.util.Objects;
 /**
  *  block
  *
+ * @author austinhigh
  */
 public class Block {
 
@@ -46,7 +47,7 @@ public class Block {
     }
 
     /**
-     * to string method
+     * to string
      *
      * @return {@link String}
      * @see String
@@ -65,7 +66,7 @@ public class Block {
     }
 
     /**
-     * hash code method
+     * hash code
      *
      * @return {@link int}
      */

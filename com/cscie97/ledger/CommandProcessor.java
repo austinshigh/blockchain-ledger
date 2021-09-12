@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 /**
  *  command processor
  *
+ * @author austinhigh
  */
 public class CommandProcessor {
 
@@ -67,6 +68,8 @@ public class CommandProcessor {
                     if (this.accessType.equals("admin")) {
                         // if admin access is set, instantiate current ledger class variable
                         currentLedger = new Ledger(commands.get(1), commands.get(3), commands.get(5));
+                        try{currentLedger.fundLedger();
+                        } catch(LedgerException e){ throw new CommandProcessorException(e);}
                     }else {
                         // throw exception if admin access not set
                         throw new CommandProcessorException("admin access required");
@@ -142,9 +145,9 @@ public class CommandProcessor {
     }
 
     /**
-     * This method scans a given text input file line by line,
-     * running the processCommmand method on each line.
-     * This method also tracks the current line in the input file,
+     * Scans input file line by line,
+     * running the processCommmand() method on each line.
+     * Also tracks the current line in the input file,
      * and will set the line number when a CommandProcessorException is thrown.
      *
      * @param file file

@@ -3,6 +3,7 @@ package com.cscie97.ledger;
 /**
  *  account
  *
+ * @author austinhigh
  */
 public class Account {
 

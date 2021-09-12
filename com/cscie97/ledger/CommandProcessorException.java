@@ -1,5 +1,10 @@
 package com.cscie97.ledger;
 
+/**
+ *  command processor exception
+ *
+ * @author austinhigh
+ */
 public class CommandProcessorException extends Exception{
 
     private String command;
@@ -36,7 +41,7 @@ public class CommandProcessorException extends Exception{
     }
 
     /**
-     * to string method
+     * to string
      * @return {@link String}
      * @see String
      */

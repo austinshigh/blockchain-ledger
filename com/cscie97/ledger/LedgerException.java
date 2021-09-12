@@ -1,5 +1,10 @@
 package com.cscie97.ledger;
 
+/**
+ *  ledger exception
+ *
+ * @author austinhigh
+ */
 public class LedgerException extends Throwable {
 
     private String action;

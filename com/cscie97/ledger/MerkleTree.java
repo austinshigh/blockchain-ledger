@@ -8,13 +8,13 @@ import java.util.ArrayList;
 /**
  *  merkle tree
  *
+ * @author Vinay Prabhu
+ * https://gist.github.com/Vinayprabhu19/3546a9f742bb74d2e0682877fec4ee86#file-merkeltree-java
  */
 public class MerkleTree {
 
     /**
      * Helper function for the recursive merkleTree() method.
-     * Implementation by Vinay Prabhu
-     * https://gist.github.com/Vinayprabhu19/3546a9f742bb74d2e0682877fec4ee86#file-merkeltree-java
      *
      * @param txnLists txnLists
      * @return {@link String}
@@ -27,8 +27,6 @@ public class MerkleTree {
 
     /**
      * Recursively creates a merkle tree, hashes values using getSha(), and returns the merkle root.
-     * Implementation by Vinay Prabhu
-     * https://gist.github.com/Vinayprabhu19/3546a9f742bb74d2e0682877fec4ee86#file-merkeltree-java
      *
      * @param hashList hashList
      * @return {@link ArrayList}
@@ -58,9 +56,7 @@ public class MerkleTree {
     }
 
     /**
-     * Takes a string as a parameter, returns a SHA256 hash of the string.
-     * Implementation by Vinay Prabhu
-     * https://gist.github.com/Vinayprabhu19/3546a9f742bb74d2e0682877fec4ee86#file-merkeltree-java
+     * Returns SHA256 hash of a string.
      *
      * @param input input
      * @return {@link String}

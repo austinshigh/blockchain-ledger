@@ -1,5 +1,10 @@
 package com.cscie97.ledger;
 
+/**
+ *  Transaction
+ *
+ * @author austinhigh
+ */
 public class Transaction {
     private int transactionId;
     private int amount;
@@ -27,7 +32,7 @@ public class Transaction {
     }
 
     /**
-     * to string method
+     * to string
      *
      * @return {@link String}
      * @see String

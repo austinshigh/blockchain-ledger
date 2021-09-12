@@ -4,8 +4,21 @@ import static java.util.Objects.isNull;
 
 
 /**
- *  ledger
+ * The Ledger manages the transactions, accounts, and blocks that make up the Blockchain.
+ * Users submit transactions which once validated are added to a block.
+ * As Blocks fill up with Transactions, Account balances are updated, and the Blocks are added to the Ledger.
+ * Once committed to the Ledger, a Block, and the contained Transactions and Account balances are immutable.
+ * To ensure the immutability of the blocks, the blocks are chained together by including the hash of
+ * the previous block as a field in each new block. The blockchain can be validated at any time by
+ * recomputing the hashes of each block and comparing the result with the hash that has been
+ * stored in the next block.
+ * [per Eric Gieseke's - CSCI-E97, Assignment 1 Design Document)
  *
+ * @see Transaction
+ * @see Account
+ * @see Block
+ * @see MerkleTree
+ * @author austinhigh
  */
 public class Ledger {
 
@@ -18,18 +31,30 @@ public class Ledger {
     /**
      * Class Constructor.
      *
-     * @param ledgerName name of ledger
-     * @param ledgerDescription description of ledger
-     * @param ledgerSeed hash value of genesis block (arbitrary)
+     * @param name name of ledger
+     * @param description description of ledger
+     * @param seed hash value of genesis block (arbitrary)
      */
-    public Ledger(String ledgerName, String ledgerDescription, String ledgerSeed){
-        this.name = ledgerName;
-        this.description = ledgerDescription;
-        this.seed = ledgerSeed;
-        Account master = new Account("master");
-        master.setBalance(2147483647);
+    public Ledger(String name, String description, String seed){
+        this.name = name;
+        this.description = description;
+        this.seed = seed;
         this.blockMap = new TreeMap<Integer, Block>();
         this.genesisBlock = new Block();
+    }
+
+    /**
+     * Used immediately after instantiation of new ledger.
+     *
+     *
+     * @throws LedgerException com.cscie97.ledger. ledger exception
+     */
+    public void fundLedger() throws LedgerException {
+        if (blockMap.size() != 0){
+            throw new LedgerException("fund ledger", "fund ledger requires a new ledger");
+        }
+        Account master = new Account("master");
+        master.setBalance(2147483647);
         this.genesisBlock.getAccountBalanceMap().put("master", master);
         this.genesisBlock.setPreviousHash(this.seed);
         this.genesisBlock.setBlockNumber(1);
@@ -37,33 +62,33 @@ public class Ledger {
     }
 
     /**
-     * This method creates a new account after verifying that the user selected account address is unique.
-     * @param uniqueAddress desired address for new account
+     * Creates a new account after verifying that the user selected account address is unique.
+     * @param address address for new account (must be unique)
      * @return New Account
      * @throws LedgerException com.cscie97.ledger. ledger exception
      */
-    public Account createAccount(String uniqueAddress) throws LedgerException {
+    public Account createAccount(String address) throws LedgerException {
         // retrieve last entry in blockchain
         Block currentBlock = blockMap.lastEntry().getValue();
-        if (currentBlock.getAccountBalanceMap().containsKey(uniqueAddress)) {
+        if (currentBlock.getAccountBalanceMap().containsKey(address)) {
             // if the most recent block contains the address already, require a unique address
             throw new LedgerException("create account", "unique account address required.");
         } else {
             // if valid address, create new account
             HashMap<String, Account> genAcctBalanceMap = currentBlock.getAccountBalanceMap();
-            Account newAcct = new Account(uniqueAddress);
+            Account newAcct = new Account(address);
             newAcct.setBalance(0);
             // add new account to ledger account balance map
-            genAcctBalanceMap.put(uniqueAddress, newAcct);
-            return new Account(uniqueAddress);
+            genAcctBalanceMap.put(address, newAcct);
+            return new Account(address);
         }
     };
 
     /**
-     * This method checks the current account balance for the block with a given address.
+     * Checks the current account balance for the block with a given address.
      * <p>
      * In this ledger implementation, the latest block in the blockchain does not contain 10 transactions,
-     * therefore it is not yet "committed". This method queries the block preceding the latest block for
+     * therefore it is not yet "committed". Queries the block preceding the latest block for
      * accurate account balances.
      *
      * @param address account address
@@ -87,7 +112,7 @@ public class Ledger {
     }
 
     /**
-     * This method returns a hashmap of all account ids and balances.
+     * Returns a hashmap of all account ids and balances.
      *
      * @return {@link HashMap}
      * @see HashMap
@@ -111,18 +136,18 @@ public class Ledger {
     }
 
     /**
-     * This method queries the ledger's block map for the transaction with the specified transaction id,
+     * Queries the ledger's block map for the transaction with the specified transaction id,
      * it then returns a deep copy of the transaction to insure immutability.
      *
-     * @param txId txId
+     * @param transactionId transactionId
      * @return {@link Transaction}
      * @see Transaction
      */
-    public Transaction getTransaction(String txId){
+    public Transaction getTransaction(String transactionId){
         // create transaction return object
         Transaction retrievedTx = null;
         // parse string input into integer
-        int txIdNum = Integer.parseInt(txId);
+        int txIdNum = Integer.parseInt(transactionId);
         for (Map.Entry<Integer, Block> entry : blockMap.entrySet()) {
             // iterate through blocks in ledger find transaction with matching id
             ArrayList<Transaction> transactionList = entry.getValue().getTransactionList();
@@ -137,7 +162,7 @@ public class Ledger {
             return null;
         }
         // perform deep copy of transaction to insure immutability
-        Transaction copiedTx = new Transaction(Integer.parseInt(txId),
+        Transaction copiedTx = new Transaction(Integer.parseInt(transactionId),
                 retrievedTx.getAmount(),
                 retrievedTx.getFee(),
                 retrievedTx.getPayload(),
@@ -147,23 +172,23 @@ public class Ledger {
     };
 
     /**
-     * This method queries the ledger's block map for the block with the specified block number,
+     * Queries the ledger's block map for the block with the specified block number,
      * it then returns a deep copy of the block to insure immutability.
      *
-     * @param blockNum blockNum
+     * @param blockNumber blockNumber
      * @return {@link Block}
      * @see Block
      * @throws LedgerException com.cscie97.ledger. ledger exception
      */
-    public Block getBlock(int blockNum) throws LedgerException{
-        if (blockNum > blockMap.size() - 1){
+    public Block getBlock(int blockNumber) throws LedgerException{
+        if (blockNumber > blockMap.size() - 1){
             // if block has not yet been committed, throw error
             throw new LedgerException("get block", "block does not exist");
         }
         // retrieve block from blockMap
-        Block retrievedBlock = blockMap.get(blockNum);
+        Block retrievedBlock = blockMap.get(blockNumber);
         // perform deep copy of block to insure immutability
-        Block copiedBlock = new Block(blockNum,
+        Block copiedBlock = new Block(blockNumber,
                 retrievedBlock.getPreviousHash(),
                 retrievedBlock.getPreviousBlock());
         copiedBlock.setHash(retrievedBlock.getHash());
@@ -173,61 +198,56 @@ public class Ledger {
     };
 
     /**
-     * This method processes a transaction, adds a new block to the ledger's block map if necessary,
+     * Processes a transaction, adds a new block to the ledger's block map if necessary,
      * and returns the new transaction's id.
      * <p>
-     * This method verifies:
+     * Verifies:
      * transaction id is unique,
      * receiver and payer accounts exist,
      * payer has sufficient funds,
      * fee is >= 10.
-     * Method then adds transaction to current block's transaction list, updates account balances,
-     * and calls blockFull() method if block contains 10 transactions.
+     * Then adds transaction to current block's transaction list, updates account balances,
+     * and calls blockFull() if block contains 10 transactions.
      *
-     * @param tx tx
+     * @param transaction transaction
      * @return {@link String}
      * @see String
      * @throws LedgerException com.cscie97.ledger. ledger exception
      */
-    public String processTransaction(Transaction tx) throws LedgerException {
-        String payerAddress = tx.getPayer();
-        String receiverAddress = tx.getReceiver();
+    public String processTransaction(Transaction transaction) throws LedgerException {
+        String payerAddress = transaction.getPayer();
+        String receiverAddress = transaction.getReceiver();
         int payerBalance;
         int receiverBalance;
         int masterBalance;
         Block currentBlock;
 
-        for (Map.Entry<Integer, Block>
-                // enforce unique transaction id
-                entry : blockMap.entrySet()) {
+        // enforce unique transaction id
+        for (Map.Entry<Integer, Block> entry : blockMap.entrySet()) {
             for (Transaction curr : entry.getValue().getTransactionList()) {
-                if (tx.getTransactionId() == curr.getTransactionId()){
+                if (transaction.getTransactionId() == curr.getTransactionId()){
                     throw new LedgerException("process transaction", "unique transaction id required.");
                 }
             }
         }
         if (this.blockMap.size() == 1){
             // if first block in the chain verify accounts exist in genesis block
-            try{
-                this.genesisBlock.getAccountBalanceMap().get(receiverAddress);
-            }catch(Exception e){
+            try{ this.genesisBlock.getAccountBalanceMap().get(receiverAddress);
+            } catch(Exception e){
                 throw new LedgerException("process transaction", "invalid receiver account address.");
             }
-            try{
-                this.genesisBlock.getAccountBalanceMap().get(payerAddress);
-            }catch(Exception e){
+            try{ this.genesisBlock.getAccountBalanceMap().get(payerAddress);
+            } catch(Exception e){
                 throw new LedgerException("process transaction", "invalid payer account address.");
             }
         }
         else {
             // else use getAccountBalance to check if account exists in Ledger's blockMap
-            try{
-                getAccountBalance(receiverAddress);
-            }catch(Exception e){
+            try{ getAccountBalance(receiverAddress);
+            } catch(Exception e){
                 throw new LedgerException("process transaction", "invalid receiver account address.");
             }
-            try{
-                getAccountBalance(payerAddress);
+            try{ getAccountBalance(payerAddress);
             }catch(Exception e){
                 throw new LedgerException("process transaction", "invalid payer account address.");
             }
@@ -240,19 +260,19 @@ public class Ledger {
         receiverBalance = currentBlock.getAccountBalanceMap().get(receiverAddress).getBalance();
 
         // instantiate transfer fee and amount variables
-        int fee = tx.getFee();
-        int amount = tx.getAmount();
+        int fee = transaction.getFee();
+        int amount = transaction.getAmount();
 
         if (payerBalance < (fee + amount)){
-            // if payer lacks sufficient funds for transaction, throw error
+            // throw error if payer lacks sufficient funds for transaction
             throw new LedgerException("process transaction", "payer has insufficient funds.");
         }
         if (fee < 10){
-            // if fee is below minimum amount, 10, throw error
+            // throw error if fee is below minimum amount(10)
             throw new LedgerException("process transaction", "transaction fee must be at least 10.");
         }
         // add transaction to list on latest block in the ledger
-        currentBlock.getTransactionList().add(tx);
+        currentBlock.getTransactionList().add(transaction);
 
         // adjust payer balance
         HashMap<String, Account> accountBalances = currentBlock.getAccountBalanceMap();
@@ -269,11 +289,11 @@ public class Ledger {
             // if transaction is 10th in block, compute hashes and create new block
             blockFull(currentBlock);
         }
-        return Integer.toString(tx.getTransactionId());
+        return Integer.toString(transaction.getTransactionId());
     };
 
     /**
-     * This method hashes the current block, creates a new block to receive future transactions,
+     * Hashes the current block, creates a new block to receive future transactions,
      * and transfers account balances from current block to new block.
      *
      * @param currentBlock currentBlock
@@ -304,8 +324,8 @@ public class Ledger {
     }
 
     /**
-     * This method returns a stringified hash value for the given block.
-     * This method uses the following formula to compute hash:
+     * Returns a stringified hash value for the given block.
+     * Uses the following formula to compute hash:
      * H(previous_block_hash + H(block_properties + merkle_root))
      *
      * @param currentBlock currentBlock
@@ -327,8 +347,8 @@ public class Ledger {
     }
 
     /**
-     * This method validates the state of the blockchain.
-     * This method verifies:
+     * Validates the state of the blockchain.
+     * Verifies:
      * that account balances total to the max value,
      * each completed block has exactly 10 transactions,
      * the hash of each block is equal to the following block's previousHash field.
