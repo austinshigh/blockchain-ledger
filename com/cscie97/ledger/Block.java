@@ -32,9 +32,9 @@ public class Block {
     /**
      * Class constructor used for each new block after genesis block
      *
-     * @param blockNumber
-     * @param previousHash
-     * @param previousBlock
+     * @param blockNumber unique identifying number (generated)
+     * @param previousHash hash of preceding block
+     * @param previousBlock previous block
      */
     public Block(int blockNumber, String previousHash, Block previousBlock){
         this.blockNumber = blockNumber;

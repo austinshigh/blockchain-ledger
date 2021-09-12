@@ -1,7 +1,5 @@
 package com.cscie97.ledger;
 import java.util.*;
-
-
 import static java.util.Objects.isNull;
 
 
@@ -15,25 +13,24 @@ public class Ledger {
     private String description;
     private String seed;
     private TreeMap<Integer, Block> blockMap;
-    private Account master;
     private Block genesisBlock;
 
     /**
      * Class Constructor.
      *
-     * @param ledgerName
-     * @param ledgerDescription
-     * @param ledgerSeed
+     * @param ledgerName name of ledger
+     * @param ledgerDescription description of ledger
+     * @param ledgerSeed hash value of genesis block (arbitrary)
      */
     public Ledger(String ledgerName, String ledgerDescription, String ledgerSeed){
         this.name = ledgerName;
         this.description = ledgerDescription;
         this.seed = ledgerSeed;
-        this.master = new Account("master");
-        this.master.setBalance(2147483647);
+        Account master = new Account("master");
+        master.setBalance(2147483647);
         this.blockMap = new TreeMap<Integer, Block>();
         this.genesisBlock = new Block();
-        this.genesisBlock.getAccountBalanceMap().put("master", this.master);
+        this.genesisBlock.getAccountBalanceMap().put("master", master);
         this.genesisBlock.setPreviousHash(this.seed);
         this.genesisBlock.setBlockNumber(1);
         blockMap.put(1, genesisBlock);
@@ -41,18 +38,16 @@ public class Ledger {
 
     /**
      * This method creates a new account after verifying that the user selected account address is unique.
-     *
-     * @param uniqueAddress uniqueAddress
-     * @return {@link Account}
-     * @see Account
-     * @throws CommandProcessorException com.cscie97.ledger. command processor exception
+     * @param uniqueAddress desired address for new account
+     * @return New Account
+     * @throws LedgerException com.cscie97.ledger. ledger exception
      */
-    public Account createAccount(String uniqueAddress) throws CommandProcessorException{
+    public Account createAccount(String uniqueAddress) throws LedgerException {
         // retrieve last entry in blockchain
         Block currentBlock = blockMap.lastEntry().getValue();
         if (currentBlock.getAccountBalanceMap().containsKey(uniqueAddress)) {
             // if the most recent block contains the address already, require a unique address
-            throw new CommandProcessorException("unique account address required.");
+            throw new LedgerException("create account", "unique account address required.");
         } else {
             // if valid address, create new account
             HashMap<String, Account> genAcctBalanceMap = currentBlock.getAccountBalanceMap();
@@ -71,11 +66,11 @@ public class Ledger {
      * therefore it is not yet "committed". This method queries the block preceding the latest block for
      * accurate account balances.
      *
-     * @param address address
+     * @param address account address
      * @return {@link int}
-     * @throws CommandProcessorException com.cscie97.ledger. command processor exception
+     * @throws LedgerException com.cscie97.ledger. ledger exception
      */
-    public int getAccountBalance(String address) throws CommandProcessorException {
+    public int getAccountBalance(String address) throws LedgerException {
         // instantiate last entry in blockchain, this entry is yet to be committed
         Block currentBlock = blockMap.lastEntry().getValue();
         try {
@@ -87,7 +82,7 @@ public class Ledger {
             return acct.getBalance();
         }catch(Exception e){
             // throw exception, invalid address, if no account found
-            throw new CommandProcessorException("invalid address");
+            throw new LedgerException("get account balance", "invalid address");
         }
     }
 
@@ -98,8 +93,9 @@ public class Ledger {
      * @see HashMap
      * @see String
      * @see Integer
+     * @throws LedgerException com.cscie97.ledger. ledger exception
      */
-    public HashMap<String, Integer> getAccountBalances() throws CommandProcessorException {
+    public HashMap<String, Integer> getAccountBalances() throws LedgerException {
         // create hashmap for return object
         HashMap<String, Integer> accountBalances = new HashMap<String, Integer>();
         try {
@@ -110,9 +106,8 @@ public class Ledger {
             }
             return accountBalances;
         }catch(Exception e){
-            throw new CommandProcessorException("no block has been committed");
+            throw new LedgerException("get all account balances", "no block has been committed");
         }
-
     }
 
     /**
@@ -158,12 +153,12 @@ public class Ledger {
      * @param blockNum blockNum
      * @return {@link Block}
      * @see Block
-     * @throws CommandProcessorException com.cscie97.ledger. command processor exception
+     * @throws LedgerException com.cscie97.ledger. ledger exception
      */
-    public Block getBlock(int blockNum) throws CommandProcessorException{
+    public Block getBlock(int blockNum) throws LedgerException{
         if (blockNum > blockMap.size() - 1){
             // if block has not yet been committed, throw error
-            throw new CommandProcessorException("block does not exist");
+            throw new LedgerException("get block", "block does not exist");
         }
         // retrieve block from blockMap
         Block retrievedBlock = blockMap.get(blockNum);
@@ -192,9 +187,9 @@ public class Ledger {
      * @param tx tx
      * @return {@link String}
      * @see String
-     * @throws CommandProcessorException com.cscie97.ledger. command processor exception
+     * @throws LedgerException com.cscie97.ledger. ledger exception
      */
-    public String processTransaction(Transaction tx) throws CommandProcessorException {
+    public String processTransaction(Transaction tx) throws LedgerException {
         String payerAddress = tx.getPayer();
         String receiverAddress = tx.getReceiver();
         int payerBalance;
@@ -207,7 +202,7 @@ public class Ledger {
                 entry : blockMap.entrySet()) {
             for (Transaction curr : entry.getValue().getTransactionList()) {
                 if (tx.getTransactionId() == curr.getTransactionId()){
-                    throw new CommandProcessorException("unique transaction id required.");
+                    throw new LedgerException("process transaction", "unique transaction id required.");
                 }
             }
         }
@@ -216,12 +211,12 @@ public class Ledger {
             try{
                 this.genesisBlock.getAccountBalanceMap().get(receiverAddress);
             }catch(Exception e){
-                throw new CommandProcessorException(e, "invalid receiver account address.");
+                throw new LedgerException("process transaction", "invalid receiver account address.");
             }
             try{
                 this.genesisBlock.getAccountBalanceMap().get(payerAddress);
             }catch(Exception e){
-                throw new CommandProcessorException(e, "invalid payer account address.");
+                throw new LedgerException("process transaction", "invalid payer account address.");
             }
         }
         else {
@@ -229,12 +224,12 @@ public class Ledger {
             try{
                 getAccountBalance(receiverAddress);
             }catch(Exception e){
-                throw new CommandProcessorException(e, "invalid receiver account address.");
+                throw new LedgerException("process transaction", "invalid receiver account address.");
             }
             try{
                 getAccountBalance(payerAddress);
             }catch(Exception e){
-                throw new CommandProcessorException(e, "invalid payer account address.");
+                throw new LedgerException("process transaction", "invalid payer account address.");
             }
         }
         // set current block to last block in blockchain
@@ -250,11 +245,11 @@ public class Ledger {
 
         if (payerBalance < (fee + amount)){
             // if payer lacks sufficient funds for transaction, throw error
-            throw new CommandProcessorException("payer has insufficient funds.");
+            throw new LedgerException("process transaction", "payer has insufficient funds.");
         }
         if (fee < 10){
             // if fee is below minimum amount, 10, throw error
-            throw new CommandProcessorException("transaction fee must be at least 10.");
+            throw new LedgerException("process transaction", "transaction fee must be at least 10.");
         }
         // add transaction to list on latest block in the ledger
         currentBlock.getTransactionList().add(tx);
@@ -282,9 +277,9 @@ public class Ledger {
      * and transfers account balances from current block to new block.
      *
      * @param currentBlock currentBlock
-     * @throws CommandProcessorException com.cscie97.ledger. command processor exception
+     * @throws LedgerException com.cscie97.ledger. ledger exception
      */
-    private void blockFull(Block currentBlock) throws CommandProcessorException {
+    private void blockFull(Block currentBlock) throws LedgerException {
         // compute and hash for current block
         String hash = computeHash(currentBlock);
         currentBlock.setHash(hash);
@@ -338,9 +333,9 @@ public class Ledger {
      * each completed block has exactly 10 transactions,
      * the hash of each block is equal to the following block's previousHash field.
      *
-     * @throws CommandProcessorException com.cscie97.ledger. command processor exception
+     * @throws LedgerException com.cscie97.ledger. ledger exception
      */
-    public void validate() throws CommandProcessorException{
+    public void validate() throws LedgerException{
         for (Map.Entry<Integer, Block>
                 // iterate through each block in the blockchain
                 entry : blockMap.entrySet()){
@@ -348,7 +343,7 @@ public class Ledger {
                 // if current block is not the most recent, uncommitted block, perform checks
                 if(entry.getValue().getTransactionList().size() != 10){
                     // if block does not contain 10 transactions, throw error
-                    throw new CommandProcessorException("block does not contain 10 transactions");
+                    throw new LedgerException("validate blockchain", "block does not contain 10 transactions");
                 }
                 if (entry.getValue().getBlockNumber() > 1) {
                     // if block is not the initial block in chain, perform check
@@ -356,7 +351,7 @@ public class Ledger {
                             .equals(computeHash(entry.getValue().getPreviousBlock())))) {
                         // retrieve the preceding block, compute the hash
                         // compare hash to the current blocks 'previousHash' attribute
-                        throw new CommandProcessorException("block hash is not equal to previous block hash," +
+                        throw new LedgerException("validate blockchain", "block hash is not equal to previous block hash," +
                                 " blockchain has been manipulated.");
                     }
                 }
@@ -367,7 +362,7 @@ public class Ledger {
                 }
                 if(sum != Integer.MAX_VALUE){
                     // if sum of balances is not equal to original master balance, throw error
-                    throw new CommandProcessorException("account balances do not total to" +
+                    throw new LedgerException("validate blockchain", "account balances do not total to" +
                             " the initial total blockchain value");
                 }
             }
@@ -443,23 +438,6 @@ public class Ledger {
      * @param blockMap blockMap
      */
     public void setBlockMap(TreeMap<Integer, Block> blockMap) {this.blockMap = blockMap;}
-
-
-    /**
-     * get master
-     *
-     * @return {@link Account}
-     * @see Account
-     */
-    public Account getMaster() {return this.master;}
-
-
-    /**
-     * set master
-     *
-     * @param master master
-     */
-    public void setMaster(Account master) {this.master = master;}
 
 
     /**

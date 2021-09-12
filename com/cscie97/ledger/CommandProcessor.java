@@ -74,11 +74,13 @@ public class CommandProcessor {
                     break;
                 case "create-account":
                     // create new account in current ledger
-                    currentLedger.createAccount(commands.get(1));
+                    try {currentLedger.createAccount(commands.get(1));}
+                    catch(LedgerException e){throw new CommandProcessorException(e);}
                     break;
                 case "get-account-balance":
                     // print account balance for specified account
-                    System.out.println(currentLedger.getAccountBalance(commands.get(1)));
+                    try {System.out.println(currentLedger.getAccountBalance(commands.get(1)));}
+                    catch(LedgerException e){throw new CommandProcessorException(e);}
                     break;
                 case "process-transaction":
                     // process new transaction
@@ -96,20 +98,24 @@ public class CommandProcessor {
                                 commands.get(9),
                                 commands.get(11));
                         // process transaction
-                        currentLedger.processTransaction(tx);
+                        try {currentLedger.processTransaction(tx);}
+                        catch(LedgerException e){throw new CommandProcessorException(e);}
                     break;
                 case "get-account-balances":
                     // get account balances for all accounts in current ledger
-                    System.out.println(currentLedger.getAccountBalances());
+                    try{ System.out.println(currentLedger.getAccountBalances());}
+                    catch(LedgerException e){throw new CommandProcessorException(e);}
                     break;
                 case "get-block":
                     // call toString method for specified block, displaying relevant block information
-                    System.out.println(currentLedger.getBlock(Integer.parseInt(commands.get(1))));
+                    try { System.out.println(currentLedger.getBlock(Integer.parseInt(commands.get(1))));}
+                    catch(LedgerException e){throw new CommandProcessorException(e);}
                     break;
                 case "set-block-hash":
                     // set the hash of the specified block to new hash input via CLI
                     // only sets the hash for the deep copy returned by getBlock() does not modify blockchain
-                    currentLedger.getBlock(Integer.parseInt(commands.get(1))).setHash(commands.get(2));
+                    try{ currentLedger.getBlock(Integer.parseInt(commands.get(1))).setHash(commands.get(2));}
+                    catch(LedgerException e){ throw new CommandProcessorException(e);}
                     break;
                 case "get-transaction":
                     // call toString method for specified transaction, displaying relevant block information
@@ -122,7 +128,8 @@ public class CommandProcessor {
                     break;
                 case "validate":
                     // validate the blockchain
-                    currentLedger.validate();
+                    try{ currentLedger.validate();}
+                    catch(LedgerException e){throw new CommandProcessorException(e);}
                     break;
                 default:
                     // catch all invalid arguments

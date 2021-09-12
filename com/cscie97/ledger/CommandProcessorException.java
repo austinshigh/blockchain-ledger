@@ -6,23 +6,30 @@ public class CommandProcessorException extends Exception{
     private String reason;
     private int lineNumber;
 
-    public CommandProcessorException(Exception e, String reason) {
-        super(reason);
-        this.reason = reason;
-    }
 
+    /**
+     * Class Constructor, handles caught CommandProcessorExceptions.
+     * @param e
+     */
     public CommandProcessorException(CommandProcessorException e) {
         super();
         this.command = e.getCommand();
         this.reason = e.getReason();
     }
 
-//    public CommandProcessorException(Exception e, String command, String reason) {
-//        super(reason);
-//        this.command = command;
-//        this.reason = reason;
-//    }
+    /**
+     * Class Constructor specifying reason for exception from Ledger Exception.
+     * @param e
+     */
+    public CommandProcessorException(LedgerException e) {
+        super();
+        this.reason = e.getReason();
+    }
 
+    /**
+     * Class Constructor specifying reason for exception.
+     * @param reason
+     */
     public CommandProcessorException(String reason) {
         super(reason);
         this.reason = reason;

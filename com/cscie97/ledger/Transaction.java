@@ -10,12 +10,12 @@ public class Transaction {
 
     /**
      * Class Constructor.
-     * @param transactionId
-     * @param amount
-     * @param fee
-     * @param payload
-     * @param payer
-     * @param receiver
+     * @param transactionId id (must be unique)
+     * @param amount amount being transferred
+     * @param fee fee to be paid to master account
+     * @param payload description of transaction
+     * @param payer account id of payer
+     * @param receiver account id of receiver
      */
     public Transaction(int transactionId, int amount, int fee, String payload, String payer, String receiver) {
         this.transactionId = transactionId;
