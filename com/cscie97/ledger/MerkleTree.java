@@ -6,7 +6,10 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 /**
- *  merkle tree
+ *  Offers encryption services to Ledger class.
+ *
+ *  createMerkleTree() : Calculates merkle root of given transaction list
+ *  getSha() : Encodes strings using SHA256 encryption
  *
  * @author Vinay Prabhu
  * https://gist.github.com/Vinayprabhu19/3546a9f742bb74d2e0682877fec4ee86#file-merkeltree-java
@@ -16,12 +19,12 @@ public class MerkleTree {
     /**
      * Helper function for the recursive merkleTree() method.
      *
-     * @param txnLists txnLists
+     * @param transactions list of transactions
      * @return {@link String}
      * @see String
      */
-    public static String createMerkleTree(ArrayList<String> txnLists) {
-        ArrayList<String> merkleRoot = merkleTree(txnLists);
+    public static String createMerkleTree(ArrayList<String> transactions) {
+        ArrayList<String> merkleRoot = merkleTree(transactions);
         return merkleRoot.get(0);
     }
 

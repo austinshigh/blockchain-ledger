@@ -1,7 +1,8 @@
 package com.cscie97.ledger;
 
 /**
- *  ledger exception
+ * Returned from the Ledger API methods in response to an error condition.
+ * Captures the action that was attempted and the reason for the failure.
  *
  * @author austinhigh
  */

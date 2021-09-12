@@ -1,7 +1,9 @@
 package com.cscie97.ledger;
 
 /**
- *  command processor exception
+ * Returned from the CommandProcessor methods in response to an error condition.
+ * Captures the command that was attempted and the reason for the failure.
+ * When commands are read from a file, the line number of the command is included as well.
  *
  * @author austinhigh
  */

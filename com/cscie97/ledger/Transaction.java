@@ -1,7 +1,11 @@
 package com.cscie97.ledger;
 
 /**
- *  Transaction
+ * Represents a transaction in the Ledger System.
+ * Contains a transaction id, an amount, a fee, a note, payer account id and receiver account id.
+ * The transaction amount is transferred from the payer’s account balance to the
+ * receiver’s account balance. The transaction fee is transferred from the payer’s account to the
+ * master account. Transactions are aggregated within blocks.
  *
  * @author austinhigh
  */
@@ -9,7 +13,7 @@ public class Transaction {
     private int transactionId;
     private int amount;
     private int fee;
-    private String payload;
+    private String note;
     private String receiver;
     private String payer;
 
@@ -18,15 +22,15 @@ public class Transaction {
      * @param transactionId id (must be unique)
      * @param amount amount being transferred
      * @param fee fee to be paid to master account
-     * @param payload description of transaction
+     * @param note description of transaction
      * @param payer account id of payer
      * @param receiver account id of receiver
      */
-    public Transaction(int transactionId, int amount, int fee, String payload, String payer, String receiver) {
+    public Transaction(int transactionId, int amount, int fee, String note, String payer, String receiver) {
         this.transactionId = transactionId;
         this.amount = amount;
         this.fee = fee;
-        this.payload = payload;
+        this.note = note;
         this.payer = payer;
         this.receiver = receiver;
     }
@@ -42,7 +46,7 @@ public class Transaction {
         return "Transaction Id: " + transactionId +
                 "\nAmount: " + amount +
                 "\nFee: " + fee +
-                "\nPayload: " + payload +
+                "\nNote: " + note +
                 "\nReceiver: " + receiver +
                 "\nPayer: " + payer;
     }
@@ -57,7 +61,7 @@ public class Transaction {
     public String getConcat(){
         String concat = (this.getFee() +
                 this.getAmount() +
-                this.getPayload() +
+                this.getNote() +
                 this.getPayer() +
                 this.getReceiver() +
                 this.getTransactionId());
@@ -119,22 +123,22 @@ public class Transaction {
     }
 
     /**
-     * get payload
+     * get note
      *
      * @return {@link String}
      * @see String
      */
-    public String getPayload() {
-        return this.payload;
+    public String getNote() {
+        return this.note;
     }
 
     /**
-     * set payload
+     * set note
      *
-     * @param payload payload
+     * @param note note
      */
-    public void setPayload(String payload) {
-        this.payload = payload;
+    public void setNote(String note) {
+        this.note = note;
     }
 
     /**

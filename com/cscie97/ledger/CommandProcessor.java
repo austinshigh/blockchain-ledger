@@ -8,7 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *  command processor
+ *  Utility class for feeding the Ledger a set of operations using command syntax.
  *
  * @author austinhigh
  */

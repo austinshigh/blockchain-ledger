@@ -1,7 +1,10 @@
 package com.cscie97.ledger;
 
 /**
- *  account
+ * Represents an individual account within the Ledger Service. An account
+ * contains an address that provides a unique identity for the Account. The Account also contains
+ * a balance that represents the value of the account. The account can only be updated by the
+ * Ledger Service.
  *
  * @author austinhigh
  */

@@ -5,7 +5,14 @@ import java.util.HashMap;
 import java.util.Objects;
 
 /**
- *  block
+ * Represents a block in the blockchain.
+ * Contains a unique identifier, the hash of the previous block, a hash of itself,
+ * and account balance map, a list of all transactions, and a reference to the previous block.
+ *
+ * Once a block has 10 transactions, it is committed to the blockchain
+ * via the Ledger's processTransaction() method. At this point, the block's
+ * account balance map becomes publicly accessible and accurately
+ * represents proven account balances.
  *
  * @author austinhigh
  */

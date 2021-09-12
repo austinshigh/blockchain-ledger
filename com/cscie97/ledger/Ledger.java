@@ -4,7 +4,7 @@ import static java.util.Objects.isNull;
 
 
 /**
- * The Ledger manages the transactions, accounts, and blocks that make up the Blockchain.
+ * Manages the transactions, accounts, and blocks that make up the Blockchain.
  * Users submit transactions which once validated are added to a block.
  * As Blocks fill up with Transactions, Account balances are updated, and the Blocks are added to the Ledger.
  * Once committed to the Ledger, a Block, and the contained Transactions and Account balances are immutable.
@@ -12,7 +12,7 @@ import static java.util.Objects.isNull;
  * the previous block as a field in each new block. The blockchain can be validated at any time by
  * recomputing the hashes of each block and comparing the result with the hash that has been
  * stored in the next block.
- * [per Eric Gieseke's - CSCI-E97, Assignment 1 Design Document)
+ * [per Eric Gieseke's CSCI-E97, Assignment 1 Design Document)
  *
  * @see Transaction
  * @see Account
@@ -59,7 +59,7 @@ public class Ledger {
 
     /**
      * Creates a new account after verifying that the user selected account address is unique.
-     * 
+     *
      * @param address address for new account (must be unique)
      * @return New Account
      * @throws LedgerException com.cscie97.ledger. ledger exception
@@ -170,7 +170,7 @@ public class Ledger {
         Transaction copiedTx = new Transaction(Integer.parseInt(transactionId),
                 retrievedTx.getAmount(),
                 retrievedTx.getFee(),
-                retrievedTx.getPayload(),
+                retrievedTx.getNote(),
                 retrievedTx.getPayer(),
                 retrievedTx.getReceiver());
         return copiedTx;
