@@ -32,20 +32,26 @@ process-transaction 7 amount 1000 fee 10 note "fund account" payer master receiv
 process-transaction 8 amount 1000 fee 10 note "fund account" payer master receiver frank
 process-transaction 9 amount 1000 fee 10 note "fund account" payer master receiver mary
 process-transaction 10 amount 1000 fee 10 note "fund account" payer master receiver bob
+# expect error, block does not exist
+get-block 10
+# expect error, block exists but has not been committed
+get-block 2
 # show the details of block #1
 get-block 1
 # set block 1 hash to "error"
 set-block-hash 1 error
-# get block hash, expect original hash
+# get block hash, expect original hash "harvard", blocks are immutable
 get-block 1
 # show the details of transaction 10
 get-transaction 10
 # set-transaction-amount of transaction 10 to 2000
 set-transaction-amount 10 2000
-# expect amount did not change, expect amount still 1000
+# expect amount did not change, expect amount still 1000, transactions are immutable
 get-transaction 10
-process-transaction 11 amount 200 fee 10 note "september" payer frank receiver jane
+# expect error, receiver pete does not exist
 process-transaction 12 amount 20 fee 10 note "uber" payer bob receiver pete
+# expect error, payer pete does not exist
+process-transaction 12 amount 20 fee 10 note "uber" payer pete receiver bob
 # expect error due to missing "fee" keyword, should display correct transaction format
 process-transaction 1 amount 1000 10 note "fund account" payer master receiver mary
 # validate blockchain

@@ -60,7 +60,6 @@ public class Ledger {
             newAcct.setBalance(0);
             // add new account to ledger account balance map
             genAcctBalanceMap.put(uniqueAddress, newAcct);
-            //currentBlock.setAccountBalanceMap(genAcctBalanceMap);
             return new Account(uniqueAddress);
         }
     };
@@ -100,16 +99,20 @@ public class Ledger {
      * @see String
      * @see Integer
      */
-    public HashMap<String, Integer> getAccountBalances(){
+    public HashMap<String, Integer> getAccountBalances() throws CommandProcessorException {
         // create hashmap for return object
         HashMap<String, Integer> accountBalances = new HashMap<String, Integer>();
-        Block lastVerifiedBlock = blockMap.lastEntry().getValue().getPreviousBlock();
-
-        for(var entry : lastVerifiedBlock.getAccountBalanceMap().entrySet()){
-            // iterate through last verified block, appending each balance to return object
-            accountBalances.put(entry.getValue().getAddress(), entry.getValue().getBalance());
+        try {
+            Block lastVerifiedBlock = blockMap.lastEntry().getValue().getPreviousBlock();
+            for (var entry : lastVerifiedBlock.getAccountBalanceMap().entrySet()) {
+                // iterate through last verified block, appending each balance to return object
+                accountBalances.put(entry.getValue().getAddress(), entry.getValue().getBalance());
+            }
+            return accountBalances;
+        }catch(Exception e){
+            throw new CommandProcessorException("no block has been committed");
         }
-        return accountBalances;
+
     }
 
     /**
@@ -158,7 +161,7 @@ public class Ledger {
      * @throws CommandProcessorException com.cscie97.ledger. command processor exception
      */
     public Block getBlock(int blockNum) throws CommandProcessorException{
-        if (blockMap.get(blockNum) == blockMap.lastEntry()){
+        if (blockNum > blockMap.size() - 1){
             // if block has not yet been committed, throw error
             throw new CommandProcessorException("block does not exist");
         }
