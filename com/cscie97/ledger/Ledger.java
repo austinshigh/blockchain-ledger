@@ -203,7 +203,7 @@ public class Ledger {
                 // enforce unique transaction id
                 entry : blockMap.entrySet()) {
             for (Transaction curr : entry.getValue().getTransactionList()) {
-               if (tx.getTransactionId() == curr.getTransactionId()){
+                if (tx.getTransactionId() == curr.getTransactionId()){
                     throw new CommandProcessorException("unique transaction id required.");
                 }
             }
@@ -324,7 +324,7 @@ public class Ledger {
         String merkleRoot = MerkleTree.createMerkleTree(txList);
         // compute total hash for current block
         String hash = MerkleTree.getSha(currentBlock.getPreviousHash()
-                        + MerkleTree.getSha(currentBlock.hashCode() + merkleRoot));
+                + MerkleTree.getSha(currentBlock.hashCode() + merkleRoot));
         return hash;
     }
 
