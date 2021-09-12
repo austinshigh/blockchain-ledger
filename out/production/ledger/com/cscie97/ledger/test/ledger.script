@@ -1,0 +1,13 @@
+# create-ledger <name> description <description> seed <seed>
+create-ledger test description “test ledger 2020” seed “harvard”
+# create-account <account-id>
+create-account mary
+create-account bob
+create-account bill
+create-account frank
+create-account jane
+# get-account-balance <account-id>
+# expect error since not committed to a block
+# get-account-balance mary
+# process-transaction <transaction-id> amount <amount> fee <fee> note <note> payer <account-address> receiver <account-address>
+process-transaction 1 amount 1000 fee 10 note “fund account” payer master receiver mary
