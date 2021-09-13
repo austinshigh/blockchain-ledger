@@ -1,0 +1,67 @@
+# specify access-type admin
+# create-ledger <name> description <description> seed <seed>
+# create-account <account-id>
+# get-account-balance <account-id>
+# expect error since not committed to a block
+CommandProcessorException:
+command = 'get-account-balance mary'
+reason = 'invalid address'
+lineNumber = 13
+# process-transaction <transaction-id> amount <amount> fee <fee> note <note> payer <account-address> receiver <account-address>
+# expect error since the account mary has not been committed to a block
+CommandProcessorException:
+command = 'get-account-balance mary'
+reason = 'invalid address'
+lineNumber = 21
+# should not show any account balances since no block has been committed
+CommandProcessorException:
+command = 'get-account-balances'
+reason = 'no block has been committed'
+lineNumber = 23
+# expect balance of 3000 for mary 
+3000
+# expect balance of 3000 for bob 
+3000
+# expect balance of 2000 for bill 
+2000
+# expect balance of 2000 for frank 
+2000
+# expect balance of 0 for jane 
+0
+# show the details of block #1 
+Block Number:  1
+Previous Hash: "harvard"
+Hash: 4384815fdeafbbc23021fe8cfb613d29cc87875765532b02d3f2801fc896824f
+Previous Block: is null
+# show the details of transaction 10
+Transaction Id: 10
+Amount: 1000
+Fee: 10
+Note: "fund account"
+Receiver: bob
+Payer: master
+# expect balance of 2000 for frank
+2000
+# expect balance of 0 for jane 
+0
+# expect balance of 200 for jane
+200
+# expect balance of 2000 - 200 - 10 => 1790
+1790
+# expect balance of 3000 + 180 => 3180
+3180
+# expect balance of 3000 - 180 - 90 => 2730
+2730
+# show all account balances for master, mary, bob, bill, frank, and jane
+{frank=1790, bob=2730, mary=3180, bill=2000, master=2147473747, jane=200}
+# this transaction should fail since it exceeds the account balance for "bob".
+CommandProcessorException:
+command = 'process-transaction 21 amount 5000 fee 10 note "food" payer bob receiver mary'
+reason = 'payer has insufficient funds.'
+lineNumber = 68
+# this transaction should fail since the minimum fee is not provided
+CommandProcessorException:
+command = 'process-transaction 22 amount 20 fee 5 note "food" payer bob receiver mary'
+reason = 'transaction fee must be at least 10.'
+lineNumber = 70
+# validate the state of the blockchain

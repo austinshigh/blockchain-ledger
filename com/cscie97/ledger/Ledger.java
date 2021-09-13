@@ -162,11 +162,10 @@ public class Ledger {
                 }
             }
         }
-        if(isNull(retrievedTx)){
-            // if transaction not found, return null
-            return null;
-        }
-        // perform deep copy of transaction to insure immutability
+        // if transaction not found, return null
+        if(retrievedTx == null){ return null;}
+
+        // create deep copy of transaction to insure immutability
         Transaction copiedTx = new Transaction(Integer.parseInt(transactionId),
                 retrievedTx.getAmount(),
                 retrievedTx.getFee(),
@@ -227,14 +226,11 @@ public class Ledger {
         int masterBalance;
         Block currentBlock;
 
-        // enforce unique transaction id
-        for (Map.Entry<Integer, Block> entry : blockMap.entrySet()) {
-            for (Transaction curr : entry.getValue().getTransactionList()) {
-                if (transaction.getTransactionId() == curr.getTransactionId()){
-                    throw new LedgerException("process transaction", "unique transaction id required.");
-                }
-            }
+        // verify that transaction id is unique
+        if (getTransaction(Integer.toString(transaction.getTransactionId())) != null){
+            throw new LedgerException("process transaction", "unique transaction id required.");
         }
+
         if (this.blockMap.size() == 1){
             // if first block in the chain verify accounts exist in genesis block
             try{ this.genesisBlock.getAccountBalanceMap().get(receiverAddress);
@@ -331,7 +327,7 @@ public class Ledger {
     /**
      * Returns a stringified hash value for the given block.
      * Uses the following formula to compute hash:
-     * H(previous_block_hash + H(block_properties + merkle_root))
+     * H( ledger seed + previous_block_hash + H(block_properties + merkle_root))
      *
      * @param currentBlock currentBlock
      * @return {@link String}
@@ -346,7 +342,7 @@ public class Ledger {
         // compute merkle root with transaction arraylist
         String merkleRoot = MerkleTree.createMerkleTree(txList);
         // compute total hash for current block
-        String hash = MerkleTree.getSha(currentBlock.getPreviousHash()
+        String hash = MerkleTree.getSha(this.seed + currentBlock.getPreviousHash()
                 + MerkleTree.getSha(currentBlock.hashCode() + merkleRoot));
         return hash;
     }

@@ -11,8 +11,11 @@ import java.util.ArrayList;
  *  createMerkleTree() : Calculates merkle root of given transaction list
  *  getSha() : Encodes strings using SHA256 encryption
  *
- * @author Vinay Prabhu
- * https://gist.github.com/Vinayprabhu19/3546a9f742bb74d2e0682877fec4ee86#file-merkeltree-java
+ *   Title: MerkleTree
+ *   Author: Vinay Prabhu
+ *   Date: 7/24/2019
+ *   Code version: Java 8
+ *   Availability: https://medium.com/@vinayprabhu19/merkel-tree-in-java-b45093c8c6bd
  */
 public class MerkleTree {
 

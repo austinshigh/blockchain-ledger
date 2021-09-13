@@ -1,0 +1,86 @@
+# specify access-type user
+# expect error since user does not have permission to create ledger
+CommandProcessorException:
+command = 'create-ledger fail description "user does not have proper permissions" seed "fail"'
+reason = 'admin access required'
+lineNumber = 4
+# specify access type as "none"
+# expect error since "none" is not a valid access type, should display correct access-type options
+CommandProcessorException:
+command = 'access-type none'
+reason = 'command should follow form:
+access-type <admin | user>'
+lineNumber = 7
+# create ledger with invalid command
+# expect error since "seed" keyword is missing, should display correct ledger-creation format
+CommandProcessorException:
+command = 'create-ledger test description "test ledger 2020" "harvard"'
+reason = 'command should follow form:
+create-ledger <name> description <description> seed <seed>'
+lineNumber = 10
+# specify access-type admin
+# create-ledger <name> description <description> seed <seed>
+# create-account <account-id>
+# expect error since the account mary has already been initialized
+CommandProcessorException:
+command = 'create-account mary'
+reason = 'unique account address required.'
+lineNumber = 18
+# expect error unique transaction id required
+CommandProcessorException:
+command = 'process-transaction 1 amount 1000 fee 10 note "fund account" payer master receiver bob'
+reason = 'unique transaction id required.'
+lineNumber = 25
+# expect error, block does not exist
+CommandProcessorException:
+command = 'get-block 10'
+reason = 'block does not exist'
+lineNumber = 36
+# expect error, block exists but has not been committed
+CommandProcessorException:
+command = 'get-block 2'
+reason = 'block does not exist'
+lineNumber = 38
+# show the details of block #1
+Block Number:  1
+Previous Hash: "harvard"
+Hash: 4384815fdeafbbc23021fe8cfb613d29cc87875765532b02d3f2801fc896824f
+Previous Block: is null
+# set block 1 hash to "error"
+# get block hash, expect original hash "harvard", blocks are immutable
+Block Number:  1
+Previous Hash: "harvard"
+Hash: 4384815fdeafbbc23021fe8cfb613d29cc87875765532b02d3f2801fc896824f
+Previous Block: is null
+# show the details of transaction 10
+Transaction Id: 10
+Amount: 1000
+Fee: 10
+Note: "fund account"
+Receiver: bob
+Payer: master
+# set-transaction-amount of transaction 10 to 2000
+# expect amount did not change, expect amount still 1000, transactions are immutable
+Transaction Id: 10
+Amount: 1000
+Fee: 10
+Note: "fund account"
+Receiver: bob
+Payer: master
+# expect error, receiver pete does not exist
+CommandProcessorException:
+command = 'process-transaction 12 amount 20 fee 10 note "uber" payer bob receiver pete'
+reason = 'invalid address'
+lineNumber = 52
+# expect error, payer pete does not exist
+CommandProcessorException:
+command = 'process-transaction 12 amount 20 fee 10 note "uber" payer pete receiver bob'
+reason = 'invalid address'
+lineNumber = 54
+# expect error due to missing "fee" keyword, should display correct transaction format
+CommandProcessorException:
+command = 'process-transaction 1 amount 1000 10 note "fund account" payer master receiver mary'
+reason = 'command should follow form:
+process-transaction <transaction-id> amount <amount> fee <fee> note <note> payer <account-address> receiver <account-address>'
+lineNumber = 56
+# validate blockchain
